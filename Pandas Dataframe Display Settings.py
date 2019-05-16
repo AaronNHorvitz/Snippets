@@ -6,7 +6,7 @@ Created on Thu May 16 11:33:46 2019
 """
 """
 When writing df.head() to display pandas data, it's annoying to see the data bunched up.
-This code, written in a jupyter notebook, will hopefully aleviate some of that concern. 
+This code, written in a jupyter notebook, will hopefully alleviate some of that concern. 
 """
 
 import pandas as pd
