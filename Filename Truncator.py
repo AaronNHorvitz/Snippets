@@ -5,9 +5,8 @@ Created on Thu May 16 11:19:03 2019
 @author: ahorvitz
 """
 """
-This is a snipet of code that renames files in one directory 
-to the right most 10 characters in the file name. 
-Thus it truncates the file name to the right most ten characters. 
+This little snippet of code, renames all the files in one directory and deposits them in another directory.
+The new filename is the right most ten characters. 
 """
 
 import os
