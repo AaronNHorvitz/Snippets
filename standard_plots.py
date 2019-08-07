@@ -56,8 +56,7 @@ def lineplot(x,y,
              figure_height = 5,
              figure_width = 14,
              font = 'Verdana'):
-    
-    import random
+    from pylab import rcParams
     if xlabel == "":
         xlabel = pd.DataFrame(x).columns[0]
     if ylabel == "":
