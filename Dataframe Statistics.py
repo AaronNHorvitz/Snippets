@@ -17,13 +17,13 @@ def dataframe_statistics(df,plot_data = 'yes'):
     def data_quality_plot(statistics,title='Total Count In Each Column'):
     
 
-        rcParams['figure.figsize'] = 14, round(len(statistics)/2,0)
+        rcParams['figure.figsize'] = 14, round(len(statistics)/1.8,0)
         statistics        = statistics.sort_values('Count', ascending = True)
         value_counts      = statistics['Count']
         nans              = statistics['NaNs']
         total             = statistics['NaNs']+statistics['Count']
         zeros             = statistics['Zeros']
-
+        negative_count    = statistics['Count of Negative Values']
         column_statistics = statistics['Column'].str.wrap(27)  #to set max line width of 27
 
         ten_percent       = total.max()*.10
@@ -36,7 +36,9 @@ def dataframe_statistics(df,plot_data = 'yes'):
         plt.barh(column_statistics, value_counts, color = 'lavender',align = 'center',edgecolor='darkgrey')
         plt.barh(column_statistics, nans, color = 'lightgreen',align = 'center',edgecolor='black',alpha=0.45)
         plt.barh(column_statistics, zeros, color = 'sandybrown',align = 'center',edgecolor='darkgrey')
+        plt.barh(column_statistics, negative_count, color = 'red',align = 'center',edgecolor='darkgrey',alpha=0.45)
         plt.axvline(x=ten_percent,color='brown',linewidth = 1.4, linestyle  = 'dashdot')
+        plt.axvline(x=0,color='dimgrey',linewidth = 1.4, linestyle  = 'dashdot')
         
         plt.xticks(rotation=45,fontsize = 12,fontweight='light',color = 'darkblue')
         plt.yticks(fontsize = 12, fontweight='light',color = 'darkblue',horizontalalignment = 'right',wrap=True)
@@ -44,20 +46,27 @@ def dataframe_statistics(df,plot_data = 'yes'):
         plt.title(title,fontsize=15,fontweight='light')
 
         
-        #Label text on each horizontal bar plot
+        #Label value counts as text on each horizontal bar plot
         for i, v in enumerate(value_counts):
-            plt.text(v + 3, i-.2, str(v), color='navy', fontsize = 12, fontweight='light')
-
-        #Label text on each horizontal bar plot
-        for i, v in enumerate(zeros):
-            plt.text(v + 3, i-.2, str(v), color='sienna', fontsize = 12, fontweight='light')
-
-        #Label text on each horizontal bar plot
-        for i, v in enumerate(nans):
-            plt.text(v + 3, i-.2, str(v), color='darkgreen', fontsize = 12, fontweight='light')
-
+            if v != 0:  plt.text(v + 3, i-.2, str(v), color='navy', fontsize = 12, fontweight='light')
+            else:       plt.text(v + 3, i-.2, str(''))
             
-        category = ['10% Marker','Count of Values','NaNs Count','Zeros  Count']
+        #Label zeros as text on each horizontal bar plot
+        for i, v in enumerate(zeros):
+            if v != 0:  plt.text(v + 3, i-.2, str(v), color='sienna', fontsize = 12, fontweight='light')
+            else:       plt.text(v + 3, i-.2, str(''))
+                
+        #Label nan values as text on each horizontal bar plot
+        for i, v in enumerate(nans):
+            if v != 0:  plt.text(v + 3, i-.2, str(v), color='darkgreen', fontsize = 12, fontweight='light')
+            else:       plt.text(v + 3, i-.2, str(''))
+
+        #Label negative counts as text on each horizontal bar plot
+        for i, v in enumerate(negative_count):
+            if v != 0:  plt.text(v + 3, i-.2, str(v), color='black', fontsize = 12, fontweight='light',horizontalalignment ='right')
+            else:       plt.text(v + 3, i-.2, str(''))
+            
+        category = ['10% Marker','0 Marker','Count of Values','NaNs Count','Zeros  Count','Count of Negative Values']
         plt.legend(category, loc = 1)
         plt.show()
 
@@ -81,6 +90,7 @@ def dataframe_statistics(df,plot_data = 'yes'):
     #Value Counts
     count_list = []
     unique_count_list = []
+    negative_count_list = []
     
     #Missing Values Lists- Initialize multple lists
     null_list = []
@@ -140,27 +150,27 @@ def dataframe_statistics(df,plot_data = 'yes'):
         percent_nulls_list.append(percent_nulls)
         percent_zeros_list.append(percent_zeros)
 
-    for column_name in name_list:
-
         if ((df[column_name].dtypes in integer_categories) | (df[column_name].dtypes in floating_point_categories)):
 
         #Create summary statistics
-            summation     = round(df[column_name].sum(),3)          #Sum of the column
-            mean          = round(df[column_name].mean(),3)         #Mean 
-            mad           = round(df[column_name].mad(),3)          #Mean Absolute Deviation
-            median        = round(df[column_name].median(),3)       #Median
-            mode          = round(df[column_name].mode(),3)         #Mode
-            minimum       = round(df[column_name].min(),3)          #Minimum
-            maximum       = round(df[column_name].max(),3)          #Maximum
-            upper_quartile = round(df[column_name].quantile(.75),3) #Upper Quartile
-            lower_quartile = round(df[column_name].quantile(.25),3) #Lower Quartile
-            std           = round(df[column_name].std(),3)          #Standard Deviation
-            variance      = round(df[column_name].var(),3)          #Variance
-            sem           = round(df[column_name].std(),3)          #Standard Error of the Mean 
-            skew          = round(df[column_name].skew(),3)         #Skewness
-            kurtosis      = round(df[column_name].kurt(),3)         #Kurtosis
+            negative_count= sum(n < 0 for n in df[column_name].values)*-1   #Count negative values
+            summation     = round(df[column_name].sum(),3)               #Sum of the column
+            mean          = round(df[column_name].mean(),3)              #Mean 
+            mad           = round(df[column_name].mad(),3)               #Mean Absolute Deviation
+            median        = round(df[column_name].median(),3)            #Median
+            mode          = round(df[column_name].mode(),3)              #Mode
+            minimum       = round(df[column_name].min(),3)               #Minimum
+            maximum       = round(df[column_name].max(),3)               #Maximum
+            upper_quartile = round(df[column_name].quantile(.75),3)      #Upper Quartile
+            lower_quartile = round(df[column_name].quantile(.25),3)      #Lower Quartile
+            std           = round(df[column_name].std(),3)               #Standard Deviation
+            variance      = round(df[column_name].var(),3)               #Variance
+            sem           = round(df[column_name].std(),3)               #Standard Error of the Mean 
+            skew          = round(df[column_name].skew(),3)              #Skewness
+            kurtosis      = round(df[column_name].kurt(),3)              #Kurtosis
         
         else:
+            negative_count = 0
             summation     = None
             mean          = None
             mad           = None
@@ -175,7 +185,9 @@ def dataframe_statistics(df,plot_data = 'yes'):
             sem           = None 
             skew          = None
             kurtosis      = None
-        
+            
+        #Append the statistics to a list
+        negative_count_list.append(negative_count)
         sum_list.append(summation)
         mean_list.append(mean)
         mad_list.append(mad)
@@ -196,6 +208,7 @@ def dataframe_statistics(df,plot_data = 'yes'):
                              'Data Type': dtype_list,
                              'Count': count_list,
                              'Count of Unique Values': unique_count_list,
+                             'Count of Negative Values': negative_count_list,
                              'NaNs':  null_list,
                              'Zeros': zero_list,
                              'NaN Percentage': percent_nulls_list,
