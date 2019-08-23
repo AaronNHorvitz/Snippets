@@ -15,6 +15,10 @@ def create_indexed_dataframe(index,actual,predicted):
                        'Predicted':predicted,
                        'Actual Diff':actual_diff,
                        'Predicted Diff':predicted_diff}).set_index('Index')
+    
+    #Repace any infinite values with a NaN and then drop any rows with a nan value
+    df = df.replace([np.inf, -np.inf], np.nan)
+    df = df.dropna()
     return df
 
 def add_residuals_normalization(df):
@@ -157,10 +161,15 @@ def diagnostic_plot(df):
     
     return df
 
-def plot_performance_measures(index,actual,predicted):
+def plot_performance_measures(df):
 
     from matplotlib import pyplot as plt
     from matplotlib import rcParams
+    
+    index = df.index
+    actual = df['Actual']
+    predicted = df['Predicted']
+    
     
     bias = mean_forecast_error(actual,predicted)
     mae  = mean_absolute_error(actual,predicted)
@@ -275,7 +284,7 @@ def plot_table(df):
     return df
 
 
-def time_series_diagnostic_main(index,actual,predicted, diagnostic_plots = True, performance_masures = True, ACF_PACF_plots = True, show_values = True):
+def time_series_diagnostic_main(index,actual,predicted, show_diagnostic_plots = True, show_performance_measures = True, show_ACF_PACF_plots = True, show_values = True):
     import pandas as pd
     import numpy as np
     from matplotlib import rcParams
@@ -283,10 +292,22 @@ def time_series_diagnostic_main(index,actual,predicted, diagnostic_plots = True,
     df = add_residuals_normalization(df)
     
     #Generate Plots
-    diagnostic_plot(df)
-    plot_performance_measures(index,actual,predicted)
-    plot_ACF_PACF(df)
-    plot_table(df)
+    if show_diagnostic_plots == True:
+        diagnostic_plot(df)
+    else: pass
+
+    if show_performance_measures == True:
+        plot_performance_measures(df)
+    else: pass
+    
+    if show_ACF_PACF_plots == True:
+        plot_ACF_PACF(df)
+    else: pass
+    
+    if show_values == True:
+        plot_table(df)
+    else: pass
 
     
     return df
+
