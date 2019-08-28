@@ -35,7 +35,7 @@ def barplot(x,y,xlabel,ylabel,title):
     return
 
 #Lineplot with various features added to it
-def lineplot(x,y,
+def feature_lineplot(x,y,
              title="",
              overlay = 'n',            #Overlay plot with subsequent plot
              text_box = 'n',
